@@ -3,6 +3,51 @@ Extra general purpose functions, stubs, macros & meta types.
 
 These functions, macros & types are either commonly used patterns, or mere stubs.
 
+# Table of Contents
+- [ExtraFun](#extrafun)
+- [Table of Contents](#table-of-contents)
+- [Stubs](#stubs)
+  - [`use`](#use)
+- [Patterns](#patterns)
+  - [`negate(callable)`](#negatecallable)
+    - [Example](#example)
+  - [`isathing(x)`](#isathingx)
+  - [`truthy(x)` and `falsy(x)`](#truthyx-and-falsyx)
+  - [`curry(callable, args...; kwargs...)`](#currycallable-args-kwargs)
+    - [Example](#example-1)
+  - [`shift(ary::Iterable{T}) -> T`](#shiftaryiterablet---t)
+    - [Example](#example-2)
+  - [`unshift(ary, elem) -> ary`](#unshiftary-elem---ary)
+    - [Example](#example-3)
+  - [`indexof(ary, elem; by, offset, strict) -> Int`](#indexofary-elem-by-offset-strict---int)
+    - [Example](#example-4)
+  - [`indexed(coll)`](#indexedcoll)
+  - [`Mutable{T}`](#mutablet)
+    - [Example](#example-5)
+  - [`hassignature(callable, argtypes::Type...)`](#hassignaturecallable-argtypestype)
+    - [Example](#example-6)
+  - [`isiterable(::T)`](#isiterablet)
+    - [Example](#example-7)
+  - [`Base.split(condition, collection)`](#basesplitcondition-collection)
+    - [Example](#example-8)
+  - [`Base.insert!(vec::Vector{T}, elem::T; before, after, by, strict)`](#baseinsertvecvectort-elemt-before-after-by-strict)
+    - [Example](#example-9)
+- [Macros](#macros)
+  - [`@sym_str`](#sym_str)
+  - [`@curry`](#curry)
+    - [Example](#example-10)
+- [Meta Types](#meta-types)
+  - [`Ident{S}`](#idents)
+    - [Example](#example-11)
+- [XCopy](#xcopy)
+  - [`xcopy(tpl; kwargs...)`](#xcopytpl-kwargs)
+    - [Example](#example-12)
+  - [`@xcopy(T::Type)`](#xcopyttype)
+  - [`xcopy_construct(tpl::T, args...; kwargs...)`](#xcopy_constructtplt-args-kwargs)
+  - [`xcopy_override(tpl, ::FieldCopyOverride{F})`](#xcopy_overridetpl-fieldcopyoverridef)
+  - [`@xcopy_override(T::Type, S::Symbol, expr::Expr)`](#xcopy_overridettype-ssymbol-exprexpr)
+    - [Example](#example-13)
+
 # Stubs
 Function stubs are generically named functions without any actual body - they are, by default, noop. Every defined stub
 takes no arguments and do absolutely nothing.
@@ -56,7 +101,7 @@ bar(0.5) # == 21
 bar(2.1) # == 88
 ```
 
-### `shift(ary::Iterable{T}) -> T`
+## `shift(ary::Iterable{T}) -> T`
 Retrieve and remove the first element from the array-like. The array-like must specialize `Base.getindex` and `Base.deleteat!` functions.
 
 ### Example
