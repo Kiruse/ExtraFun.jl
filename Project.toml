@@ -2,3 +2,6 @@ name = "ExtraFun"
 uuid = "963d7961-7533-4a80-bf6b-d3653d506006"
 authors = ["Kiruse <kiruse@kiruse.dev>"]
 version = "1.0.0"
+
+[compat]
+julia = "1.1"
