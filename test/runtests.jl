@@ -21,6 +21,24 @@ function testmultiply(base::Integer, factor::Number; truncate::Bool = false)
     end
 end
 
+@testset "ExtraFun Functions" begin
+    @testset "indexof" begin
+        @test indexof([1, 2, 3], 2) == 2
+        @test indexof([1, 2, 3], 1, offset=2) === nothing
+        @test indexof([1, 2, 3], 1, by=(x)->x-2) == 3
+    end
+    
+    @testset "[xv]flip!" begin
+        let mat = [1 2 3; 4 5 6; 7 8 9]
+            @test vflip!(mat) == [7 8 9; 4 5 6; 1 2 3]
+        end
+        
+        let mat = [1 2 3; 4 5 6; 7 8 9]
+            @test hflip!(mat) == [3 2 1; 6 5 4; 9 8 7]
+        end
+    end
+end
+
 @testset "ExtraFun Macros" begin
     @testset "@sym_str" begin
         @test sym"foobar" === :foobar
@@ -56,12 +74,6 @@ end
         @test identtest(:bar) == 69.69
     end
     
-    @testset "indexof" begin
-        @test indexof([1, 2, 3], 2) == 2
-        @test indexof([1, 2, 3], 1, offset=2) === nothing
-        @test indexof([1, 2, 3], 1, by=(x)->x-2) == 3
-    end
-    
     @testset "indexed" begin
         let ary = [1, 2, 3]
             @test indexed(ary) === ary
@@ -72,16 +84,6 @@ end
         let set = Set((1, 2, 3)), idxed = indexed(set)
             @test 1 ∈ idxed && 2 ∈ idxed && 3 ∈ idxed
             @test set !== idxed
-        end
-    end
-    
-    @testset "[xv]flip!" begin
-        let mat = [1 2 3; 4 5 6; 7 8 9]
-            @test vflip!(mat) == [7 8 9; 4 5 6; 1 2 3]
-        end
-        
-        let mat = [1 2 3; 4 5 6; 7 8 9]
-            @test hflip!(mat) == [3 2 1; 6 5 4; 9 8 7]
         end
     end
     
