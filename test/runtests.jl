@@ -131,6 +131,15 @@ end
             @test immutable.mutable[] == 42
         end
     end
+    
+    @testset "Dirty" begin
+        let dirty = Dirty(42)
+            @test !isdirty(dirty)
+            dirty[] += 1
+            @test isdirty(dirty)
+            @test dirty[] == 43
+        end
+    end
 end
 
 include("./Test.XCopy.jl")
