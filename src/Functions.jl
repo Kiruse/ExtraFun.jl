@@ -10,6 +10,10 @@ negate(x) = (args...; kwargs...) -> !x(args...; kwargs...)
 export isathing
 const isathing = negate(isnothing)
 
+export isinstanceof
+isinstanceof(x::T2, ::Type{T1}) where {T1, T2<:T1} = true
+isinstanceof(_, _) = false
+
 export truthy, falsy
 truthy(::Nothing) = false
 truthy(b::Bool)   = b

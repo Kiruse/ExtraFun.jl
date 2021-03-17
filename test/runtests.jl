@@ -37,6 +37,15 @@ end
             @test hflip!(mat) == [3 2 1; 6 5 4; 9 8 7]
         end
     end
+    
+    @testset "isinstanceof" begin
+        @test isinstanceof(42, Number)
+        @test isinstanceof(42, Integer)
+        @test isinstanceof(42, Int)
+        @test !isinstanceof(42, Unsigned)
+        @test !isinstanceof(42, AbstractFloat)
+        @test isinstanceof(Immutable(42, false), Immutable)
+    end
 end
 
 @testset "ExtraFun Macros" begin
