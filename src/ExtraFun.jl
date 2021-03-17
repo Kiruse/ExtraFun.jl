@@ -9,6 +9,7 @@ include("./Stubs.jl")
 include("./Types.jl")
 include("./Functions.jl")
 include("./Macros.jl")
+include("./Functionals.jl")
 include("./XCopy.jl")
 
 end # module
