@@ -67,22 +67,6 @@ end
         end
     end
     
-    @testset "Mutable" begin
-        let immutable = Immutable(42, false)
-            immutable.mutable[] = 42
-            @test immutable.mutable[] == 42
-        end
-    end
-    
-    @testset "Ident" begin
-        identtest(::Ident{:foo}) = 42
-        identtest(::Ident{:bar}) = 69.69
-        identtest(ident::Symbol) = identtest(Ident{ident}())
-        
-        @test identtest(:foo) == 42
-        @test identtest(:bar) == 69.69
-    end
-    
     @testset "indexed" begin
         let ary = [1, 2, 3]
             @test indexed(ary) === ary
@@ -128,6 +112,24 @@ end
         @test falsy(0.0)
         @test !falsy(-1)
         @test !falsy(1//1)
+    end
+end
+
+@testset "ExtraFun Types" begin
+    @testset "Ident" begin
+        identtest(::Ident{:foo}) = 42
+        identtest(::Ident{:bar}) = 69.69
+        identtest(ident::Symbol) = identtest(Ident{ident}())
+        
+        @test identtest(:foo) == 42
+        @test identtest(:bar) == 69.69
+    end
+    
+    @testset "Mutable" begin
+        let immutable = Immutable(42, false)
+            immutable.mutable[] = 42
+            @test immutable.mutable[] == 42
+        end
     end
 end
 
