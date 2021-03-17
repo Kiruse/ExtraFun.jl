@@ -22,6 +22,13 @@ function testmultiply(base::Integer, factor::Number; truncate::Bool = false)
 end
 
 @testset "ExtraFun Functions" begin
+    @testset "curry" begin
+        let curried = curry(testmultiply, 42, truncate=true)
+            @test curried(2.1) == 88
+            @test curried(0.4) == 16
+        end
+    end
+    
     @testset "indexof" begin
         @test indexof([1, 2, 3], 2) == 2
         @test indexof([1, 2, 3], 1, offset=2) === nothing
@@ -59,14 +66,7 @@ end
     end
 end
 
-@testset "ExtraFun Patterns" begin
-    @testset "curry" begin
-        let curried = curry(testmultiply, 42, truncate=true)
-            @test curried(2.1) == 88
-            @test curried(0.4) == 16
-        end
-    end
-    
+@testset "ExtraFun Functions" begin
     @testset "indexed" begin
         let ary = [1, 2, 3]
             @test indexed(ary) === ary
