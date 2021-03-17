@@ -5,4 +5,5 @@
 export use
 function use() end
 
-
+export clear
+function clear() end
