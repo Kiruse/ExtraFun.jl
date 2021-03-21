@@ -2,13 +2,14 @@
 # General purpose macros
 # -----
 # Licensed under MIT License
-export @sym_str, @curry
 
+export @sym_str
 macro sym_str(str)
     esc(:(Symbol($str)))
 end
 
 # Like curry, but applies it to all first-level method calls in a block.
+export @curry
 """`@curry exprs...`
  
  Injects `exprs` as the first arguments in every first-level method calls of the last argument. Like [`curry`](@ref),
@@ -86,4 +87,46 @@ function curry_makekwarg(arg::Expr)
     else
         throw(ArgumentError("Unknown expression $arg"))
     end
+end
+
+
+export @with
+"""`@with resources... block`
+ Produces code like:
+ ```
+ let resources...
+    try
+        block
+    finally
+        close.(resources)
+    end
+ end
+ ```
+ 
+ This is useful for resources implementing `Base.close` but no callbacked resource opener.
+ """
+macro with(exprs::Union{Symbol, Expr}...)
+    block = last(exprs)
+    assignments = with_assignments(__source__, exprs[1:lastindex(exprs)-1])
+    vars = extract_with_varname.(assignments)
+    
+    closers = Expr(:., :close, Expr(:tuple, Expr(:tuple, vars...)))
+    wrap    = Expr(:try, block, false, false, closers)
+    esc(Expr(:let, Expr(:block, assignments...), wrap))
+end
+
+with_assignments(__source__, exprs) = (with_assignment(__source__, expr, Mutable(0)) for expr in exprs)
+function with_assignment(__source__, expr::Expr, counter::Mutable{<:Integer})
+    if expr.head === :(=)
+        expr
+    else
+        counter[] += 1
+        Expr(:(=), Symbol("$(__source__.file):$(__source__.line):$(counter[])"))
+    end
+end
+with_assignment(_, var::Symbol, _) = Expr(:(=), var, var)
+
+function extract_with_varname(expr::Expr)
+    @assert expr.head === :(=) "Not an assignment"
+    expr.args[1]
 end

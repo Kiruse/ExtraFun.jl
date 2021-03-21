@@ -13,6 +13,12 @@ Immutable(mutable, flag) = Immutable(Mutable(mutable), flag)
 Immutable(mutable) = Immutable(mutable, false)
 Base.:(==)(lhs::Immutable, rhs::Immutable) = lhs.mutable == rhs.mutable && lhs.flag == rhs.flag
 
+struct Resource
+    open::Mutable{Bool}
+end
+Resource() = Resource(Mutable(true))
+Base.close(res::Resource) = res.open[] = false
+
 function testmultiply(base::Integer, factor::Number; truncate::Bool = false)
     if truncate
         floor(base*factor)
@@ -63,6 +69,14 @@ end
     
     @testset "@curry" begin
         @test(@curry(42, truncate=true, testmultiply(2.1)) == 88)
+    end
+    
+    @testset "@with" begin
+        @test begin
+            res = Resource()
+            @with res begin end
+            !res.open[]
+        end
     end
 end
 
