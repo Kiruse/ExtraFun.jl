@@ -36,6 +36,8 @@ These functions, macros & types are either commonly used patterns, or mere stubs
   - [`@sym_str`](#sym_str)
   - [`@curry`](#curry)
     - [Example](#example-10)
+  - [`@with`](#with)
+    - [Usage](#usage)
 - [Meta Types](#meta-types)
   - [`Ident{S}`](#idents)
     - [Example](#example-11)
@@ -228,6 +230,37 @@ using sys
     println(42) # prints "0xFF42 42" to stderr
 end
 ```
+
+## `@with`
+Resource management inspired by other languages' `with` keyword. It generates Julia code in the following syntax:
+
+```julia
+@with resources... block
+# is (almost) equivalent to
+try
+  let resources...
+    block
+  end
+finally
+  close.(resources)
+end
+```
+
+### Usage
+Usage is similar to other languages' `with` keyword:
+
+```julia
+res1 = SomeCloseableResource()
+@with res1 res2 = SomeCloseableResource() SomeCloseableResource() begin
+  println(res1)
+  println(res2)
+end
+println(res1)
+# res2 and last resource undefined here
+```
+
+Note: for `res1` above to work, `SomeCloseableResource()` should be or contain a reference to the closeable resource. If
+it can be copied bitwise, `res1` may remain unchanged outside of `@with`.
 
 # Meta Types
 Meta Types are types (abstract or concrete) which either provide additional information on other types, or merely convey
