@@ -34,23 +34,25 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Macros](#macros)
   - [`@curry`](#curry)
     - [Example](#example-9)
+  - [`@once`](#once)
+    - [Example](#example-10)
   - [`@sym_str`](#sym_str)
   - [`@with`](#with)
     - [Usage](#usage)
 - [Types](#types)
   - [`Mutable{T}`](#mutablet)
-    - [Example](#example-10)
+    - [Example](#example-11)
 - [Meta Types](#meta-types)
   - [`Ident{S}`](#idents)
-    - [Example](#example-11)
+    - [Example](#example-12)
 - [XCopy](#xcopy)
   - [`xcopy(tpl; kwargs...)`](#xcopytpl-kwargs)
-    - [Example](#example-12)
+    - [Example](#example-13)
   - [`@xcopy(T::Type)`](#xcopyttype)
   - [`xcopy_construct(tpl::T, args...; kwargs...)`](#xcopy_constructtplt-args-kwargs)
   - [`xcopy_override(tpl, ::FieldCopyOverride{F})`](#xcopy_overridetpl-fieldcopyoverridef)
   - [`@xcopy_override(T::Type, S::Symbol, expr::Expr)`](#xcopy_overridettype-ssymbol-exprexpr)
-    - [Example](#example-13)
+    - [Example](#example-14)
 
 # Stubs
 Function stubs are generically named functions without any actual body - they are, by default, noop. Every defined stub
@@ -207,6 +209,22 @@ A convenience macro which curries every single first-level function call in its 
     println("foobar") # prints "0xFF42 foobar" to stderr
     println(42) # prints "0xFF42 42" to stderr
 end
+```
+
+## `@once`
+A convenience macro which ensures the given code is only executed once per session.
+
+### Example
+```julia
+function foo(n)
+    @once n > 512 println("parameter exceeds safety threshold")
+    n+1
+end
+
+foo(513)
+# prints: parameter exceeds safety threshold
+foo(514)
+# does not print
 ```
 
 ## `@sym_str`

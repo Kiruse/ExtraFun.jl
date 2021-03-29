@@ -13,9 +13,20 @@ end
 Resource() = Resource(Mutable(true))
 Base.close(res::Resource) = res.open[] = false
 
+function foo(n::Integer)
+    @once n > 512 throw("triggered once")
+    nothing
+end
+
 @testset "ExtraFun Macros" begin
     @testset "@curry" begin
         @test(@curry(42, truncate=true, testmultiply(2.1)) == 88)
+    end
+    
+    @testset "@once" begin
+        @test foo(512) === nothing
+        @test_throws "triggered once" foo(513)
+        @test foo(514) === nothing
     end
     
     @testset "@sym_str" begin
