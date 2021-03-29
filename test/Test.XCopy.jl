@@ -2,6 +2,9 @@
 # Unit Tests for ExtraFun's XCopy pattern
 # -----
 # Licensed under MIT License
+module TestXCopy
+using Test
+using ExtraFun
 
 struct XCopyTest1
     counter::Int
@@ -34,3 +37,4 @@ end
         end
     end
 end
+end # module TestXCopy

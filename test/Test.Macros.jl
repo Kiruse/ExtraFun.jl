@@ -3,7 +3,9 @@
 # -----
 # Licensed under MIT License
 module TestMacros
-import Helpers: testmultiply
+using Test
+using ExtraFun
+import ..Helpers: testmultiply
 
 struct Resource
     open::Mutable{Bool}

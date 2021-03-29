@@ -3,6 +3,8 @@
 # -----
 # Licensed under MIT License
 module TestFunctions
+using Test
+using ExtraFun
 import ..Helpers: Immutable, testmultiply
 
 @testset "ExtraFun Functions" begin

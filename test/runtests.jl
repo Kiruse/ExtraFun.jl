@@ -2,8 +2,6 @@
 # ExtraFun unit tests
 # -----
 # Licensed under MIT License.
-using Test
-
 module Helpers
     using ExtraFun
     
