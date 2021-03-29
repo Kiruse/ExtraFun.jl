@@ -8,36 +8,38 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Table of Contents](#table-of-contents)
 - [Stubs](#stubs)
   - [`use`](#use)
-- [Patterns](#patterns)
+- [Functionals](#functionals)
   - [`negate(callable)`](#negatecallable)
     - [Example](#example)
   - [`isathing(x)`](#isathingx)
   - [`truthy(x)` and `falsy(x)`](#truthyx-and-falsyx)
+  - [`indexed(coll)`](#indexedcoll)
+- [Functions](#functions)
   - [`curry(callable, args...; kwargs...)`](#currycallable-args-kwargs)
     - [Example](#example-1)
-  - [`shift(ary::Iterable{T}) -> T`](#shiftaryiterablet---t)
-    - [Example](#example-2)
-  - [`unshift(ary, elem) -> ary`](#unshiftary-elem---ary)
-    - [Example](#example-3)
   - [`indexof(ary, elem; by, offset, strict) -> Int`](#indexofary-elem-by-offset-strict---int)
-    - [Example](#example-4)
-  - [`indexed(coll)`](#indexedcoll)
-  - [`Mutable{T}`](#mutablet)
-    - [Example](#example-5)
-  - [`hassignature(callable, argtypes::Type...)`](#hassignaturecallable-argtypestype)
-    - [Example](#example-6)
+    - [Example](#example-2)
   - [`isiterable(::T)`](#isiterablet)
+    - [Example](#example-3)
+  - [`hassignature(callable, argtypes::Type...)`](#hassignaturecallable-argtypestype)
+    - [Example](#example-4)
+  - [`shift(ary::Iterable{T}) -> T`](#shiftaryiterablet---t)
+    - [Example](#example-5)
+  - [`unshift(ary, elem) -> ary`](#unshiftary-elem---ary)
+    - [Example](#example-6)
+  - [`Base.insert!(vec::Vector{T}, elem::T; before, after, by, strict)`](#baseinsertvecvectort-elemt-before-after-by-strict)
     - [Example](#example-7)
   - [`Base.split(condition, collection)`](#basesplitcondition-collection)
     - [Example](#example-8)
-  - [`Base.insert!(vec::Vector{T}, elem::T; before, after, by, strict)`](#baseinsertvecvectort-elemt-before-after-by-strict)
-    - [Example](#example-9)
 - [Macros](#macros)
-  - [`@sym_str`](#sym_str)
   - [`@curry`](#curry)
-    - [Example](#example-10)
+    - [Example](#example-9)
+  - [`@sym_str`](#sym_str)
   - [`@with`](#with)
     - [Usage](#usage)
+- [Types](#types)
+  - [`Mutable{T}`](#mutablet)
+    - [Example](#example-10)
 - [Meta Types](#meta-types)
   - [`Ident{S}`](#idents)
     - [Example](#example-11)
@@ -65,7 +67,7 @@ these intentions are merely intended to give you an idea what to use these stubs
 ## `use`
 Intended to indicate a change of state, either globally or locally to a container object.
 
-# Patterns
+# Functionals
 Following are general purpose patterns packaged in functions (and possibly corresponding types) for convenience.
 
 ## `negate(callable)`
@@ -82,6 +84,12 @@ Simple negation of `Base.isnothing(x)`.
 
 ## `truthy(x)` and `falsy(x)`
 `truthy` is a functional way of evaluating the "truth" of a value - as prominent in many other languages. In general, this means at least one bit is set. `falsy` is simply `negate(truthy)`.
+
+## `indexed(coll)`
+A functional alternative to `Base.collect(coll)` which only collects `coll` into a `Vector` if it isn't indexable, otherwise returns `coll` itself.
+
+# Functions
+Imperative general purpose functions.
 
 ## `curry(callable, args...; kwargs...)`
 Curries the specified `callable` by prepending `args` in front of positional arguments and passing additional `kwargs`. Note that Julia enforces that keyword must be unique.
@@ -103,6 +111,45 @@ bar(0.5) # == 21
 bar(2.1) # == 88
 ```
 
+## `indexof(ary, elem; by, offset, strict) -> Int`
+Finds the index of the given element in the array-like. If the element was not found, returns `nothing`.
+
+`by` specifies a mapping callback on each element returning the mapped value to compare. The mapper is not called on `elem`.
+
+`offset` specifies the 1-based offset from the start of the array-like to begin search.
+
+`strict` specifies whether to use simple equality (`==`) or strict equality (`===`).
+
+### Example
+```julia
+indexof([1, 2, 3], 5, by=(i)->i-2, strict=true) # == 3
+indexof([1, 2, 3], 5) # == -1
+indexof([1, 2, 3], 1, offset=2) # == -1
+```
+
+## `isiterable(::T)`
+Generated function pattern to test if a signature for `Base.iterate(::T)` exists.
+
+Beware as this pattern may malbehave if such a signature is loaded *after* the first call to this generated function.
+
+### Example
+```julia
+isiterable([]) # == true
+isiterable(:foobar) # == false
+isiterable(42) # == true
+```
+
+## `hassignature(callable, argtypes::Type...)`
+Function pattern to test if a specific signature of a function exists.
+
+### Example
+```julia
+struct MyStruct end
+
+hassignature(push!, Vector{Int}) # == true
+hassignature(push!, MyStruct) # == false
+```
+
 ## `shift(ary::Iterable{T}) -> T`
 Retrieve and remove the first element from the array-like. The array-like must specialize `Base.getindex` and `Base.deleteat!` functions.
 
@@ -122,80 +169,6 @@ Insert `elem` at index 1 of the array-like. The array-like must support the sign
 unshift([2, 3, 4], 1) # == [1, 2, 3, 4]
 ```
 
-## `indexof(ary, elem; by, offset, strict) -> Int`
-Finds the index of the given element in the array-like. If the element was not found, returns `nothing`.
-
-`by` specifies a mapping callback on each element returning the mapped value to compare. The mapper is not called on `elem`.
-
-`offset` specifies the 1-based offset from the start of the array-like to begin search.
-
-`strict` specifies whether to use simple equality (`==`) or strict equality (`===`).
-
-### Example
-```julia
-indexof([1, 2, 3], 5, by=(i)->i-2, strict=true) # == 3
-indexof([1, 2, 3], 5) # == -1
-indexof([1, 2, 3], 1, offset=2) # == -1
-```
-
-## `indexed(coll)`
-A functional alternative to `Base.collect(coll)` which only collects `coll` into a `Vector` if it isn't indexable, otherwise returns `coll` itself.
-
-## `Mutable{T}`
-A simple mutable wrapper around a single field of type `T`. The `Mutable` type comes in handy either as a way to reference variables, or to mark a single field of an otherwise immutable struct as mutable.
-
-### Example
-```julia
-mutable struct Mutable{T}
-    value::T
-end
-
-struct Immutable
-    immutable::Int
-    mutable::Mutable{Bool}
-end
-Immutable(immutable, mutable::Bool) = Immutable(immutable, Mutable(mutable))
-
-myvar = Immutable(42, false)
-myvar.mutable[] # == false
-myvar.mutable[] = true
-myvar.mutable[] # == true
-myvar.immutable += 1 # throws
-```
-
-## `hassignature(callable, argtypes::Type...)`
-Function pattern to test if a specific signature of a function exists.
-
-### Example
-```julia
-struct MyStruct end
-
-hassignature(push!, Vector{Int}) # == true
-hassignature(push!, MyStruct) # == false
-```
-
-## `isiterable(::T)`
-Generated function pattern to test if a signature for `Base.iterate(::T)` exists.
-
-Beware as this pattern may malbehave if such a signature is loaded *after* the first call to this generated function.
-
-### Example
-```julia
-isiterable([]) # == true
-isiterable(:foobar) # == false
-isiterable(42) # == true
-```
-
-## `Base.split(condition, collection)`
-Split `collection` into two distinct ones where the first contains all elements for which `condition` returns true and the second all those for which `condition` returns false.
-
-Currently supports standard vectors and tuples.
-
-### Example
-```julia
-split(iseven, collect(1:10)) # == ([2, 4, 6, 8, 10], [1, 3, 5, 7, 9])
-```
-
 ## `Base.insert!(vec::Vector{T}, elem::T; before, after, by, strict)`
 Inserts `elem` into `vec` either before or after the named element. Exclusively either `before` or `after` must be supplied. If none or both are supplied, an `ArgumentError` is raised.
 
@@ -212,24 +185,34 @@ insert!(Wrapper.([1, 2, 3, 4, 6]), 5, before=6, by=(w)->w.int)
 insert!(Wrapper.([1, 2, 3, 4, 6]), 5, after=4, by=(w)->w.int)
 ```
 
+## `Base.split(condition, collection)`
+Split `collection` into two distinct ones where the first contains all elements for which `condition` returns true and the second all those for which `condition` returns false.
+
+Currently supports standard vectors and tuples.
+
+### Example
+```julia
+split(iseven, collect(1:10)) # == ([2, 4, 6, 8, 10], [1, 3, 5, 7, 9])
+```
+
 # Macros
 ExtraFun provides a handful of useful yet simple macros. These include:
-
-## `@sym_str`
-A simple string prefix to produce a symbol. Literally equivalent to `Symbol(str)`. The advantage of using the `sym""`
-notation is that it allows using characters otherwise illegal in `:` notation whilst shortening syntax slightly.
 
 ## `@curry`
 A convenience macro which curries every single first-level function call in its block expression. This is useful to call multiple functions reusing various identical arguments.
 
 ### Example
 ```julia
-using sys
-@curry 0xFF42 file = sys.stderr begin
+@curry 0xFF42 file = stderr begin
     println("foobar") # prints "0xFF42 foobar" to stderr
     println(42) # prints "0xFF42 42" to stderr
 end
 ```
+
+## `@sym_str`
+A simple string prefix to produce a symbol. Literally equivalent to `Symbol(str)`. The advantage of using the `sym""`
+notation is that it allows using characters otherwise illegal in `:` notation whilst shortening syntax slightly.
+
 
 ## `@with`
 Resource management inspired by other languages' `with` keyword. It generates Julia code in the following syntax:
@@ -261,6 +244,32 @@ println(res1)
 
 Note: for `res1` above to work, `SomeCloseableResource()` should be or contain a reference to the closeable resource. If
 it can be copied bitwise, `res1` may remain unchanged outside of `@with`.
+
+# Types
+General purpose and simple types.
+
+## `Mutable{T}`
+A simple mutable wrapper around a single field of type `T`. The `Mutable` type comes in handy either as a way to reference variables, or to mark a single field of an otherwise immutable struct as mutable.
+
+### Example
+```julia
+mutable struct Mutable{T}
+    value::T
+end
+
+struct Immutable
+    immutable::Int
+    mutable::Mutable{Bool}
+end
+Immutable(immutable, mutable::Bool) = Immutable(immutable, Mutable(mutable))
+
+myvar = Immutable(42, false)
+myvar.mutable[] # == false
+myvar.mutable[] = true
+myvar.mutable[] # == true
+myvar.immutable += 1 # throws
+```
+
 
 # Meta Types
 Meta Types are types (abstract or concrete) which either provide additional information on other types, or merely convey
