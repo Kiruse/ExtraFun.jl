@@ -134,14 +134,13 @@ end
 
 export @once
 macro once(cond::Union{Bool, Expr}, expr)
-    label = Symbol("$(__source__.file):$(__source__.line)")
-    ONCE_CONDITIONS[label] = false
+    label = QuoteNode(Symbol("$(__source__.file):$(__source__.line)"))
     esc(quote
-        if !ExtraFun.ONCE_CONDITIONS[$(QuoteNode(label))] && $cond
-            ExtraFun.ONCE_CONDITIONS[$(QuoteNode(label))] = true
+        if $label ∉ ExtraFun.ONCE_CONDITIONS && $cond
+            push!(ExtraFun.ONCE_CONDITIONS, $label)
             $expr
         end
     end)
 end
 
-const ONCE_CONDITIONS = Dict{Symbol, Bool}()
+const ONCE_CONDITIONS = Set{Symbol}()
