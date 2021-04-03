@@ -19,6 +19,13 @@ function foo(n::Integer)
 end
 
 @testset "ExtraFun Macros" begin
+    @testset "@await" begin
+        let t0 = time()
+            @test @await(sleep(0.2), 42) == 42
+            @test isapprox(time()-t0, 0.2, atol=0.05)
+        end
+    end
+    
     @testset "@curry" begin
         @test(@curry(42, truncate=true, testmultiply(2.1)) == 88)
     end

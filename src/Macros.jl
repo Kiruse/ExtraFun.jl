@@ -3,6 +3,11 @@
 # -----
 # Licensed under MIT License
 
+export @await
+macro await(exprs...)
+    esc(:(fetch(@sync @async begin; $(exprs...); end)))
+end
+
 export @sym_str
 macro sym_str(str)
     esc(:(Symbol($str)))
