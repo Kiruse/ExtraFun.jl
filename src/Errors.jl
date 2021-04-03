@@ -13,6 +13,6 @@ function Base.show(io::IO, err::TimeoutError)
     if isempty(err.message)
         print(io, "Timeout")
     else
-        print(io, "Timeout: $(err.message))
+        print(io, "Timeout: $(err.message)")
     end
 end
