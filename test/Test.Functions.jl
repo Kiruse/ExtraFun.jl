@@ -39,5 +39,72 @@ import ..Helpers: Immutable, testmultiply
         @test !isinstanceof(42, AbstractFloat)
         @test isinstanceof(Immutable(42, false), Immutable)
     end
+    
+    @testset "Extended Base.wait" begin
+        let cond = Condition()
+            @sync begin
+                flag = false
+                
+                @async begin
+                    lock(cond) do
+                        sleep(rand())
+                        flag = true
+                        notify(cond)
+                    end
+                end
+                
+                @test @await begin
+                    lock(cond) do
+                        @assert !flag
+                        wait(() -> flag, cond)
+                        @assert flag
+                    end
+                    true
+                end
+            end
+        end
+        
+        let cond = Condition()
+            lock(cond) do
+                @test_throws TimeoutError wait(() -> false, cond, timeout=0.5)
+            end
+        end
+        
+        let cond = Condition()
+            t0 = time()
+            @sync begin
+                flag = false
+                
+                # These shouldn't change the outcome
+                @async begin
+                    sleep(0.1)
+                    lock(cond) do; notify(cond) end
+                    sleep(0.1)
+                    lock(cond) do; notify(cond) end
+                end
+                
+                @async begin
+                    sleep(0.5)
+                    lock(cond) do
+                        flag = true
+                        notify(cond)
+                    end
+                end
+                
+                @test @await begin
+                    t0 = time()
+                    lock(cond) do
+                        @async begin
+                            @assert !flag
+                            wait(() -> flag, cond)
+                            @assert flag
+                        end
+                    end
+                    true
+                end
+            end
+            @test isapprox(time()-t0, 0.5, atol=0.1)
+        end
+    end
 end
 end # module TestFunctions

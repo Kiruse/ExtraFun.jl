@@ -6,6 +6,7 @@ module ExtraFun
 export use
 
 include("./Stubs.jl")
+include("./Errors.jl")
 include("./Types.jl")
 include("./Functions.jl")
 include("./Macros.jl")

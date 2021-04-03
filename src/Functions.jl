@@ -81,3 +81,29 @@ end
 is_call_expr(_) = false
 is_call_expr(expr::Expr) = expr.head === :call
 is_call_assignment(expr::Expr) = expr.head === :(=) && is_call_expr(expr.args[2])
+
+
+function Base.wait(test, cond::Condition; timeout::Number = Inf)
+    if timeout === Inf
+        while !test()
+            wait(cond)
+        end
+    else
+        t1 = time() + timeout
+        timer = Timer(timeout)
+        @async begin
+            wait(timer)
+            notify(cond)
+        end
+        
+        while !test() && time() < t1
+            @sync @async wait(cond)
+        end
+        
+        close(timer)
+        if time() >= t1
+            throw(TimeoutError())
+        end
+    end
+    nothing
+end
