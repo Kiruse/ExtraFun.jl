@@ -7,9 +7,10 @@ export use
 
 include("./Stubs.jl")
 include("./Errors.jl")
+include("./Macros.jl")
+
 include("./Types.jl")
 include("./Functions.jl")
-include("./Macros.jl")
 include("./Functionals.jl")
 include("./XCopy.jl")
 
