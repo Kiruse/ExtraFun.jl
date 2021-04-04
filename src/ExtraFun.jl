@@ -13,5 +13,6 @@ include("./Types.jl")
 include("./Functions.jl")
 include("./Functionals.jl")
 include("./XCopy.jl")
+include("./Events.jl")
 
 end # module
