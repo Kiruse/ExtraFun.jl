@@ -120,13 +120,13 @@ macro with(exprs::Union{Symbol, Expr}...)
     esc(Expr(:let, Expr(:block, assignments...), wrap))
 end
 
-with_assignments(__source__, exprs) = (with_assignment(__source__, expr, Mutable(0)) for expr in exprs)
-function with_assignment(__source__, expr::Expr, counter::Mutable{<:Integer})
+with_assignments(__source__, exprs) = (with_assignment(__source__, expr, Ref{Int}(0)) for expr in exprs)
+function with_assignment(__source__, expr::Expr, counter::Ref{<:Integer})
     if expr.head === :(=)
         expr
     else
         counter[] += 1
-        Expr(:(=), Symbol("$(__source__.file):$(__source__.line):$(counter[])"))
+        Expr(:(=), Symbol("$(__source__.file):$(__source__.line):$(counter[])"), expr)
     end
 end
 with_assignment(_, var::Symbol, _) = Expr(:(=), var, var)

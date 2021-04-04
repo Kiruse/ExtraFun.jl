@@ -7,11 +7,14 @@ using Test
 using ExtraFun
 import ..Helpers: testmultiply
 
-struct Resource
+struct Resource1
     open::Mutable{Bool}
 end
-Resource() = Resource(Mutable(true))
-Base.close(res::Resource) = res.open[] = false
+Resource1() = Resource1(Mutable(true))
+Base.close(res::Resource1) = res.open[] = false
+
+struct Resource2 end
+Base.close(::Resource2) = throw("closed")
 
 function foo(n::Integer)
     @once n > 512 throw("triggered once")
@@ -43,10 +46,13 @@ end
     
     @testset "@with" begin
         @test begin
-            res = Resource()
+            res = Resource1()
             @with res begin end
             !res.open[]
         end
+        
+        @test_throws "closed" @with Resource2() begin end
+        @test_throws "closed" @with res = Resource2() begin end
     end
 end
 end # module TestMacros
