@@ -84,26 +84,30 @@ is_call_assignment(expr::Expr) = expr.head === :(=) && is_call_expr(expr.args[2]
 
 
 function Base.wait(test, cond::Condition; timeout::Number = Inf)
+    value = nothing
+    
     if timeout === Inf
         while !test()
-            wait(cond)
+            value = wait(cond)
         end
     else
-        t1 = time() + timeout
+        istimeout = false
         timer = Timer(timeout)
         @async begin
             wait(timer)
+            istimeout = true
             notify(cond)
         end
         
-        while !test() && time() < t1
-            @sync @async wait(cond)
+        while !test() && !istimeout
+            value = @await wait(cond)
         end
         
         close(timer)
-        if time() >= t1
+        if istimeout
             throw(TimeoutError())
         end
     end
-    nothing
+    
+    return value
 end

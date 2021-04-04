@@ -65,6 +65,30 @@ import ..Helpers: Immutable, testmultiply
         end
         
         let cond = Condition()
+            value = nothing
+            @sync begin
+                wakeup = false
+                
+                @async begin
+                    lock(cond) do
+                        sleep(0.1)
+                        notify(cond, 24)
+                        sleep(0.1)
+                        wakeup = true
+                        notify(cond, 42)
+                    end
+                end
+                
+                @async begin
+                    lock(cond) do
+                        value = wait(() -> wakeup, cond)
+                    end
+                end
+            end
+            @test value == 42
+        end
+        
+        let cond = Condition()
             lock(cond) do
                 @test_throws TimeoutError wait(() -> false, cond, timeout=0.5)
             end
@@ -104,6 +128,30 @@ import ..Helpers: Immutable, testmultiply
                 end
             end
             @test isapprox(time()-t0, 0.5, atol=0.1)
+        end
+        
+        let cond = Condition()
+            value = nothing
+            @sync begin
+                wakeup = false
+                
+                @async begin
+                    lock(cond) do
+                        sleep(0.1)
+                        notify(cond, 24)
+                        sleep(0.1)
+                        wakeup = true
+                        notify(cond, 42)
+                    end
+                end
+                
+                @async begin
+                    lock(cond) do
+                        value = wait(() -> wakeup, cond; timeout=0.5)
+                    end
+                end
+            end
+            @test value == 42
         end
     end
 end
