@@ -7,7 +7,8 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [ExtraFun](#extrafun)
 - [Table of Contents](#table-of-contents)
 - [Stubs](#stubs)
-  - [`use`](#use)
+  - [use](#use)
+  - [clear](#clear)
 - [Functionals](#functionals)
   - [`negate(callable)`](#negatecallable)
     - [Example](#example)
@@ -66,8 +67,11 @@ ease of use.
 Following is an enumeration of all function stubs exported by ExtraFun, along with their respective intention. In turn,
 these intentions are merely intended to give you an idea what to use these stubs for.
 
-## `use`
+## use
 Intended to indicate a change of state, either globally or locally to a container object.
+
+## clear
+Intended to empty a collection or clear the state of an object.
 
 # Functionals
 Following are general purpose patterns packaged in functions (and possibly corresponding types) for convenience.
