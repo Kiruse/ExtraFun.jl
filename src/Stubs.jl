@@ -7,3 +7,6 @@ function use() end
 
 export clear
 function clear() end
+
+export update!
+function update!() end

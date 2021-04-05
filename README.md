@@ -9,6 +9,7 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Stubs](#stubs)
   - [use](#use)
   - [clear](#clear)
+  - [update!](#update)
 - [Functionals](#functionals)
   - [`negate(callable)`](#negatecallable)
     - [Example](#example)
@@ -72,6 +73,10 @@ Intended to indicate a change of state, either globally or locally to a containe
 
 ## clear
 Intended to empty a collection or clear the state of an object.
+
+## update!
+Intended to update the (internal) state of an object. Useful to defer comparatively heavy computations to the end of a
+cycle, for example.
 
 # Functionals
 Following are general purpose patterns packaged in functions (and possibly corresponding types) for convenience.
