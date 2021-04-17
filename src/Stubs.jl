@@ -10,3 +10,12 @@ function clear() end
 
 export update!
 function update!() end
+
+export init
+function init() end
+
+export store
+function store() end
+
+export restore
+function restore() end
