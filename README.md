@@ -9,6 +9,9 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Stubs](#stubs)
   - [use](#use)
   - [clear](#clear)
+  - [init](#init)
+  - [restore](#restore)
+  - [store](#store)
   - [update!](#update)
 - [Functionals](#functionals)
   - [`negate(callable)`](#negatecallable)
@@ -73,6 +76,19 @@ Intended to indicate a change of state, either globally or locally to a containe
 
 ## clear
 Intended to empty a collection or clear the state of an object.
+
+## init
+Initialize something. Intended for deferred initialization of a resource. Possibly reopen an existing resource without
+having to fully reconstruct it, reusing previously supplied data.
+
+## restore
+Restore the state of an object from an external resource, typically a file or an internet resource. Forms the
+complementary counterpiece to `ExtraFun.store` method.
+
+## store
+Store the state of an object in an external resource, typically a file or an internet resource. Unlike the standard
+library's `Serialization.deserialize` method, this method is intended for Julia-version and platform independent
+serialization. For this purpose, it is advised to store a complementary file format version and/or parity data.
 
 ## update!
 Intended to update the (internal) state of an object. Useful to defer comparatively heavy computations to the end of a
