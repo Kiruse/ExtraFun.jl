@@ -3,6 +3,20 @@
 # -----
 # Licensed under MIT License
 
+export CancellationError
+struct CancellationError <: Exception
+    what
+end
+CancellationError() = CancellationError(nothing)
+
+function Base.showerror(io::IO, err::CancellationError)
+    print(io, "Cancelled")
+    if err.what !== nothing
+        print(io, ": ")
+        print(io, err.what)
+    end
+end
+
 export TimeoutError
 struct TimeoutError <: Exception
     message::String
