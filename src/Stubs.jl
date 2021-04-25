@@ -3,19 +3,19 @@
 # -----
 # Licensed under MIT License
 export use
-function use() end
+use() = MethodError(use, ())
 
 export clear
-function clear() end
+clear() = MethodError(clear, ())
 
 export update!
-function update!() end
+update!() = MethodError(update!, ())
 
 export init
-function init() end
+init() = MethodError(init, ())
 
 export store
-function store() end
+store() = MethodError(store, ())
 
 export restore
-function restore() end
+restore() = MethodError(restore, ())
