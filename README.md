@@ -8,6 +8,7 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Table of Contents](#table-of-contents)
 - [Stubs](#stubs)
   - [use](#use)
+  - [cancel](#cancel)
   - [clear](#clear)
   - [init](#init)
   - [restore](#restore)
@@ -73,6 +74,9 @@ these intentions are merely intended to give you an idea what to use these stubs
 
 ## use
 Intended to indicate a change of state, either globally or locally to a container object.
+
+## cancel
+Intended to cancel a time-consuming task, such as an intense computation or a blocking IO operation.
 
 ## clear
 Intended to empty a collection or clear the state of an object.

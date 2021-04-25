@@ -5,6 +5,9 @@
 export use
 use() = MethodError(use, ())
 
+export cancel
+cancel() = MethodError(cancel, ())
+
 export clear
 clear() = MethodError(clear, ())
 
