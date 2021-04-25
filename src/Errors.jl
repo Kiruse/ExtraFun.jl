@@ -23,7 +23,7 @@ struct TimeoutError <: Exception
 end
 TimeoutError() = TimeoutError("")
 
-function Base.show(io::IO, err::TimeoutError)
+function Base.showerror(io::IO, err::TimeoutError)
     if isempty(err.message)
         print(io, "Timeout")
     else
