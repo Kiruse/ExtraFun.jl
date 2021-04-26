@@ -21,7 +21,12 @@ end
 """`cancel(cancellable_task, reason = nothing)`
 Cancel a blocking/yielding task with a `CancellationError(reason)`. The task may intercept this error in a try ... catch
 block if necessary."""
-ExtraFun.cancel(task::CancellableTask, reason = nothing) = (schedule(task.wrapped, CancellationError(reason), error=true); task)
+function ExtraFun.cancel(task::CancellableTask, reason = nothing)
+    if task.wrapped._state == 0
+        schedule(task.wrapped, CancellationError(reason), error=true)
+    end
+    return task
+end
 
 Base.schedule(task::CancellableTask) = (schedule(task.wrapped); task)
 Base.schedule(task::CancellableTask, val; error::Bool = false) = (schedule(task.wrapped, val, error=error); task)
@@ -59,10 +64,12 @@ function with_timeout(cb, timeout::Real; schedule_immediately::Bool = true)
 end
 
 function ExtraFun.cancel(task::TimeoutTask, reason = nothing)
-    err = CancellationError(reason)
-    schedule(task.task_cb,      err, error=true)
-    schedule(task.task_timeout, err, error=true)
-    task
+    if task.task_cb._state == 0
+        err = CancellationError(reason)
+        schedule(task.task_cb,      err, error=true)
+        schedule(task.task_timeout, err, error=true)
+    end
+    return task
 end
 
 function Base.schedule(task::TimeoutTask)

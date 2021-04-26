@@ -41,6 +41,21 @@ end
                 throw("foobar")
             end)
         end
+        
+        @testset "late cancel" begin
+            let task = with_cancel(() -> sleep(1))
+                @assert cancel(task) === task
+                @test task_fails(CancellationError) do; wait(task); end
+                @test cancel(task) === task
+                @test task_fails(CancellationError) do; wait(task); end
+            end
+            
+            let task = with_cancel(() -> 42)
+                @assert fetch(task) == 42
+                @test cancel(task) === task
+                @test fetch(task) == 42
+            end
+        end
     end
     
     @testset "Timeouts" begin
@@ -54,6 +69,20 @@ end
             wait(with_timeout(1) do
                 throw("foobar")
             end)
+        end
+        
+        @testset "late cancel" begin
+            let task = with_timeout(() -> sleep(1), .5)
+                @assert task_fails(TimeoutError) do; wait(task); end
+                @test cancel(task) === task
+                @test task_fails(TimeoutError) do; wait(task); end
+            end
+            
+            let task = with_timeout(() -> 42, .5)
+                @assert fetch(task) == 42
+                @test cancel(task) === task
+                @test fetch(task) == 42
+            end
         end
     end
 end
