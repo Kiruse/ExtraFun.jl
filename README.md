@@ -48,17 +48,25 @@ These functions, macros & types are either commonly used patterns, or mere stubs
 - [Types](#types)
   - [`Mutable{T}`](#mutablet)
     - [Example](#example-11)
+  - [CancellableTask](#cancellabletask)
+    - [with_cancel](#with_cancel)
+  - [Signature](#signature)
+  - [Example](#example-12)
+  - [TimeoutTask](#timeouttask)
+    - [with_timeout](#with_timeout)
+  - [Signature](#signature-1)
+  - [Example](#example-13)
 - [Meta Types](#meta-types)
   - [`Ident{S}`](#idents)
-    - [Example](#example-12)
+    - [Example](#example-14)
 - [XCopy](#xcopy)
   - [`xcopy(tpl; kwargs...)`](#xcopytpl-kwargs)
-    - [Example](#example-13)
+    - [Example](#example-15)
   - [`@xcopy(T::Type)`](#xcopyttype)
   - [`xcopy_construct(tpl::T, args...; kwargs...)`](#xcopy_constructtplt-args-kwargs)
   - [`xcopy_override(tpl, ::FieldCopyOverride{F})`](#xcopy_overridetpl-fieldcopyoverridef)
   - [`@xcopy_override(T::Type, S::Symbol, expr::Expr)`](#xcopy_overridettype-ssymbol-exprexpr)
-    - [Example](#example-14)
+    - [Example](#example-16)
 
 # Stubs
 Function stubs are generically named functions without any actual body - they are, by default, noop. Every defined stub
@@ -315,6 +323,81 @@ myvar.mutable[] # == false
 myvar.mutable[] = true
 myvar.mutable[] # == true
 myvar.immutable += 1 # throws
+```
+
+## CancellableTask
+Wrapper around a `Task` object with a specialization of `ExtraFun.cancel` to cancel cancel a blocking and/or yielding task prematurely. Unfortunately, these cannot be used with `@sync` and `@async`.
+
+### with_cancel
+To conveniently create such a task, the `with_cancel` method is introduced. Its signature is as follows:
+
+Signature
+---------
+```julia
+with_cancel(callback, schedule_immediately::Bool = false)::CancellableTask
+```
+
+Example
+-------
+```julia
+using ExtraFun
+
+task1 = with_cancel() do
+  sleep(9999)
+end
+task2 = with_cancel() do
+  return 42
+end
+task3 = with_cancel() do
+  throw("foobar")
+end
+
+cancel(task1)
+wait(task1) # throws TaskFailedException wrapping CancellationError
+
+fetch(task2) == 42 # success
+
+wait(task3) # throws TaskFailedException wrapping "foobar"
+```
+
+## TimeoutTask
+Wrapper around a `Task` object with an automatic timeout. The timeout only affects the task if it blocks and/or yields. One can `Base.wait`, `Base.fetch`, or `ExtraFun.cancel` the task. Like a `CancellableTask`, the `CancellationError` thrown by `Base.wait` and `Base.fetch` will be wrapped by a `TaskFailedException`. Analogously, the `TimeoutError` triggered upon timing out will also be wrapped in such a `TaskFailedException`. Like `CancellableTask`, these tasks are incompatible with `@sync` and `@async`.
+
+### with_timeout
+To conveniently create such a task, the `with_timeout` method is introduced. Its signature is as follows:
+
+Signature
+---------
+```julia
+with_timeout(callback, timeout::Real; schedule_immediately::Bool)::TimeoutTask
+```
+
+Example
+-------
+```julia
+using ExtraFun
+
+task1 = with_timeout(2) do
+  sleep(3)
+end
+task2 = with_timeout(2) do
+  return 42
+end
+task3 = with_timeout(2) do
+  sleep(3)
+end
+task4 = with_timeout(3) do
+  throw("foobar")
+end
+
+wait(task1) # throws TaskFailedException wrapping TimeoutError
+
+fetch(task2) == 42 # success
+
+cancel(task3)
+wait(task3) # throws TaskFailedException wrapping CancellationError
+
+wait(task4) # throws TaskFailedException wrapping "foobar"
 ```
 
 
