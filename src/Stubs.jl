@@ -3,22 +3,22 @@
 # -----
 # Licensed under MIT License
 export use
-use() = MethodError(use, ())
+use(args...; kwargs...) = MethodError(use, (kwargs, args...))
 
 export cancel
-cancel() = MethodError(cancel, ())
+cancel(args...; kwargs...) = MethodError(cancel, (kwargs, args...))
 
 export clear
-clear() = MethodError(clear, ())
+clear(args...; kwargs...) = MethodError(clear, (kwargs, args...))
 
 export update!
-update!() = MethodError(update!, ())
+update!(args...; kwargs...) = MethodError(update!, (kwargs, args...))
 
 export init
-init() = MethodError(init, ())
+init(args...; kwargs...) = MethodError(init, (kwargs, args...))
 
 export store
-store() = MethodError(store, ())
+store(args...; kwargs...) = MethodError(store, (kwargs, args...))
 
 export restore
-restore() = MethodError(restore, ())
+restore(args...; kwargs...) = MethodError(restore, (kwargs, args...))
