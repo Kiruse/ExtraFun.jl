@@ -21,6 +21,23 @@ import ..Helpers: Immutable
         end
     end
     
+    @testset "iterable" begin
+        @test iterable(42) === 42
+        let ary = [1, 2, 3]
+            @test iterable(ary) === ary
+        end
+        let tpl = (1, 2, 3)
+            @test iterable(tpl) === tpl
+        end
+        let set = Set((1, 2, 3))
+            @test iterable(set) === set
+        end
+        let itr = iterable(Ident{42}())
+            @test itr isa Tuple
+            @test hassignature(iterate, typeof(itr))
+        end
+    end
+    
     @testset "split collections" begin
         @test split(iseven, collect(1:10)) == (collect(2:2:10), collect(1:2:9))
         @test split(iseven, tuple(1:10...)) == (tuple(2:2:10...), tuple(1:2:9...))

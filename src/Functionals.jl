@@ -72,3 +72,21 @@ end
 indexed(v) = indexed(indexability(v), v)
 indexed(::Indexed, v) = v
 indexed(::NonIndexed, v) = collect(v)
+
+export iterable
+abstract type Iterability end
+struct Iterable <: Iterability end
+struct NonIterable <: Iterability end
+@generated function iterability(x)
+    if hassignature(iterate, x)
+        :(Iterable())
+    else
+        :(NonIterable())
+    end
+end
+"""`iterable(x)`
+If `x` is iterable (i.e. `iterate(x)` exists), return `x`. Otherwise, return an iterable container around `x`, e.g.
+`tuple(x)`. The result of this function will always be iterable."""
+iterable(x) = iterable(iterability(x), x)
+iterable(::Iterable, x) = x
+iterable(::NonIterable, x) = (x,)

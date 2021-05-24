@@ -19,6 +19,7 @@ These functions, macros & types are either commonly used patterns, or mere stubs
   - [isathing](#isathing)
   - [truthy and falsy](#truthy-and-falsy)
   - [indexed](#indexed)
+  - [iterable](#iterable)
 - [Functions](#functions)
   - [curry](#curry)
   - [indexof](#indexof)
@@ -121,6 +122,9 @@ falsy(x) = !truthy(x)
 
 ## indexed
 A functional alternative to `Base.collect(coll)` which only collects `coll` into a `Vector` if it isn't indexable, otherwise returns `coll` itself.
+
+## iterable
+Return the passed-in argument if a signature of `Base.iterate` exists for it, otherwise return an iterable type around the argument. The result of this function will always be iterable.
 
 # Functions
 Imperative general purpose functions.
