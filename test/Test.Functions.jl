@@ -15,6 +15,12 @@ import ..Helpers: Immutable, testmultiply
         end
     end
     
+    @testset "decamelcase" begin
+        @test decamelcase("fooBarBaz") == "foo_bar_baz"
+        @test decamelcase("FooBarbaz") == "foo_barbaz"
+        @test decamelcase("FoobarBaz", uppercase=true) == "FOOBAR_BAZ"
+    end
+    
     @testset "indexof" begin
         @test indexof([1, 2, 3], 2) == 2
         @test indexof([1, 2, 3], 1, offset=2) === nothing

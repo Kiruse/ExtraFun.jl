@@ -22,6 +22,7 @@ These functions, macros & types are either commonly used patterns, or mere stubs
   - [iterable](#iterable)
 - [Functions](#functions)
   - [curry](#curry)
+  - [decamelcase](#decamelcase)
   - [indexof](#indexof)
   - [isiterable](#isiterable)
   - [hassignature](#hassignature)
@@ -152,6 +153,21 @@ end
 bar = curry(foo, 42; dofloor=true)
 bar(0.5) # == 21
 bar(2.1) # == 88
+```
+
+## decamelcase
+Transform a camel-cased string into its underscored counterpiece. Useful e.g. to transform `Symbol`s in macros.
+
+### Signature
+```julia
+decamelcase(str::AbstractString; uppercase::Bool = false)::AbstractString
+```
+
+### Example
+```julia
+decamelcase("fooBarBaz") === "foo_bar_baz"
+decamelcase("FoobarBaz") === "foobar_baz"
+decamelcase("FooBarBaz", uppercase=true) === "FOO_BAR_BAZ"
 ```
 
 ## indexof

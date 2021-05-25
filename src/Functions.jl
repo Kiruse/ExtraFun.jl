@@ -31,6 +31,15 @@ end
 export curry
 curry(fn, curryargs...; kwcurryargs...) = (moreargs...; kwargs...) -> fn(curryargs..., moreargs...; kwcurryargs..., kwargs...)
 
+export decamelcase
+"""`decamelcase(str; uppercase::Bool = false)`
+Remove camel-case and transform into lowercase or uppercase with underscore separators (e.g. "fooBarBaz" to "foo_bar_baz").
+If `uppercase` is true, the result will be uppercased, otherwise lowercased."""
+function decamelcase(str::AbstractString; uppercase::Bool = false)
+    casetransform = uppercase ? Base.uppercase : lowercase
+    casetransform(replace(str, r"(\p{Ll})(\p{Lu})" => s"\1_\2"))
+end
+
 export indexof
 indexof(arr, elem; by = identity, offset::Integer = 1, strict::Bool = false) = findnext(curr->strict ? by(curr) === elem : by(curr) == elem, arr, offset)
 
