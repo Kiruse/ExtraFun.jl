@@ -41,6 +41,7 @@ These functions, macros & types are either commonly used patterns, or mere stubs
   - [TimeoutTask](#timeouttask)
 - [Meta Types](#meta-types)
   - [Ident](#ident)
+  - [Optional & Unknown](#optional--unknown)
 - [XCopy](#xcopy)
   - [xcopy function](#xcopy-function)
   - [@xcopy macro](#xcopy-macro)
@@ -486,6 +487,68 @@ struct Ident{S} end
 extract(::Ident{:foo}) = 42
 extract(::Ident{:bar}) = 69.69
 ```
+
+## Optional & Unknown
+*ExtraFun* introduces an `Optional{S, T}` meta type which represents a value which theoretically exists but may or may not be loaded at the time. If the value is not loaded, the `Optional` will contain `unknown` - the only instance of `Unknown`, similar to `nothing` and `Nothing`. While `T` can be any type, `S` is a vanity parameter intended as a unique identifier for your `Optional`, allowing specialization of `Base.getindex(::Optional{S})` while retaining interoperability with other `Optional`s of other `S`.
+
+### Usage
+The signature of `Optional` is rather complex. Plentiful specializations of `Base.convert` allow you to use it in the most intuitive ways. Generally, the `S` identifier can be ignored; it will default to `:generic`. It is only relevant to retrieving the actual value of the `Optional` in case the current value is `unknown`.
+
+Getting and setting the value proceeds much like `Ref` through `Base.getindex` and `Base.setindex!`, or rather `opt[]` and `opt[] = value`. The default implementation of `Base.getindex` tests if the wrapped value is `unknown`. If so, it calls `ExtraFun.load(::Optional)`, caches its return value, and passes it on. The default implementation of `Base.setindex!` always overrides the value regardless. All of the above methods may be specialized on your `S` identifier.
+
+Alternatively, you may test if an `Optional` contains `unknown` with `ExtraFun.isunknown`, and then `ExtraFun.load` it with additional arguments if necessary.
+
+Generally, whichever usage you imagine is probably possible. If not, drop me an issue and I'll see about implementing it!
+
+Some examples:
+
+```julia
+Optional() # == Optional{:generic, Any}(unknown)
+Optional(42) # == Optional{:generic, Int}(42)
+Optional(:myoptional, 24)
+Optional{:myoptional}() # == Optional{:myoptional, Any}(unknown)
+Optional{:foo, Real}() # == Optional{:foo, Real}(unknown)
+Optional{:bar, Integer}(42.) # == Optional{:bar, Integer}(42)
+
+struct Foo
+  opt::Optional{:foo, Float32}
+end
+Foo() = Foo(unknown)
+Foo() # == Foo(Optional{:foo, Float32}(unknown))
+Foo(42) # == Foo(Optional{:foo, Float32}(42.0f0))
+Foo(42).opt[] === 42.f0
+Foo(Optional(42)) # == Foo(Optional{:foo, Float32}(42.0f0))
+Foo().opt   = 42 # |-- These are equivalent due to Base.convert
+Foo().opt[] = 42 # |--
+
+struct Bar
+  opt::Optional{:bar}
+end
+Bar(42) # == Bar(Optional{:bar, Int}(42))
+Bar(Optional{:generic, Integer}(42)) # == Bar(Optional{:generic, Integer}(42))
+
+struct Baz
+  opt::Optional{S, Float32} where S
+end
+ExtraFun.load(opt::Optional{:baz}) = opt.value = 69.69
+ExtraFun.load(io::IO, opt::Optional{:baz}) = opt.value = read(io, Float32)
+
+Baz(42) # == Baz(Optional{:generic, Float32}(42.0f0))
+Baz(Optional{:baz, Real}(42)) # == Baz(Optional{:baz, Float32}(42.0f0))
+Baz(Optional(:baz, 42)) # == Baz(Optional{:baz, Float32}(42.0f0))
+Baz(unknown).opt[] ≈ 69.69
+
+let baz = Baz(unknown)
+  buff = IOBuffer() # Prepare external storage
+  buff.write(24.f0)
+  buff.seek(0)
+  
+  load(buff, baz)
+  baz.opt[] == 24.f0
+end
+```
+
+Sometimes, simply calling `load(optional)` is not enough. You may depend on additional arguments such as a file handle. In that case, manually 
 
 # XCopy
 A more complex pattern which ExtraFun provides is the `xcopy` function and macro family. These allow customizing by various degrees of depth how an object is copied.
