@@ -17,6 +17,9 @@ update!(args...; kwargs...) = MethodError(update!, (kwargs, args...))
 export init
 init(args...; kwargs...) = MethodError(init, (kwargs, args...))
 
+export load
+load(args...; kwargs...) = MethodError(load, (kwargs, args...))
+
 export store
 store(args...; kwargs...) = MethodError(store, (kwargs, args...))
 
