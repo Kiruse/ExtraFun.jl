@@ -35,7 +35,12 @@ Optional(value::T) where T = Optional{:generic, T}(value)
 Optional(::Unknown) = Optional{:generic, Any}(unknown)
 Optional() = Optional(unknown)
 
-Base.getindex(opt::Optional) = opt.value
+function Base.getindex(opt::Optional)
+    if isunknown(opt)
+        load(opt)
+    end
+    opt.value
+end
 Base.setindex!(opt::Optional, value) = opt.value = value
 
 Base.convert(::Type{Optional{S}}, value) where S = Optional{S}(value)
@@ -48,6 +53,13 @@ Base.convert(::Type{Optional{S, T} where S}, value) where T = Optional{:generic,
 Base.convert(::Type{Optional{S} where S}, opt::Optional) = opt
 Base.convert(::Type{Optional{S1, T} where S1}, opt::Optional{S2, T} where S2) where T = opt
 Base.convert(::Type{Optional{S1, T} where S1}, opt::Optional{S2}) where {S2, T} = Optional{S2, T}(opt.value)
+
+export isunknown
+isunknown(opt::Optional) = opt.value === unknown
+
+export load
+"""`load(::Optional)` loads the `Optional`'s associated value from remote storage and caches it."""
+load(opt::Optional) = opt.value = unknown
 
 
 export Dirty, markdirty!, isdirty

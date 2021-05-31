@@ -71,6 +71,31 @@ import ..Helpers: Immutable
             @test WithSymbollessOptional{Real}(Optional(42)).opt[] == 42
             @test WithSymbollessOptional{Integer}(Optional(42.)).opt[] == 42
         end
+        
+        @testset "implicit load" begin
+            ExtraFun.load(opt::Optional{:implicit_load}) = opt.value = 42
+            let opt = Optional{:implicit_load}()
+                @assert isunknown(opt)
+                @test opt[] == 42
+                @test !isunknown(opt)
+            end
+        end
+        
+        @testset "explicit load" begin
+            ExtraFun.load(io::IO, opt::Optional{:explicit_load, T}) where T = opt.value = read(io, T)
+            let buff = IOBuffer(), opt = Optional{:explicit_load, Int}()
+                write(buff, 42)
+                seek(buff, 0)
+                @test load(buff, opt) == 42
+                @test opt[] == 42
+            end
+            let buff = IOBuffer(), opt = Optional{:explicit_load, Float32}()
+                write(buff, 24.f0)
+                seek(buff, 0)
+                @test load(buff, opt) ≈ 24
+                @test opt[] ≈ 24
+            end
+        end
     end
     
     @testset "Dirty" begin
