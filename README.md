@@ -123,7 +123,7 @@ falsy(x) = !truthy(x)
 ```
 
 ## indexed
-A functional alternative to `Base.collect(coll)` which only collects `coll` into a `Vector` if it isn't indexable, otherwise returns `coll` itself.
+A functional alternative to `Base.collect(coll)`. If `coll` is 1-dimensionally indexable (`getindex(coll, i)`), `coll` is returned directly. If `coll` is iterable (`iterate(coll)`), returns `collect(coll)`. Otherwise, returns `(coll,)` (1-tuple containing only `coll`).
 
 ## iterable
 Return the passed-in argument if a signature of `Base.iterate` exists for it, otherwise return an iterable type around the argument. The result of this function will always be iterable.
