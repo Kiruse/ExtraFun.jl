@@ -61,17 +61,21 @@ end
 export indexed
 abstract type Indexability end
 struct Indexed <: Indexability end
-struct NonIndexed <: Indexability end
+struct Collectible <: Indexability end
+struct Singular <: Indexability end
 @generated function indexability(x)
     if hassignature(getindex, x, Integer)
         :(Indexed())
+    elseif hassignature(iterate, x)
+        :(Collectible())
     else
-        :(NonIndexed())
+        :(Singular())
     end
 end
 indexed(v) = indexed(indexability(v), v)
 indexed(::Indexed, v) = v
-indexed(::NonIndexed, v) = collect(v)
+indexed(::Collectible, v) = collect(v)
+indexed(::Singular, x) = (x,)
 
 export iterable
 abstract type Iterability end

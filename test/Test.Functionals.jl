@@ -19,6 +19,14 @@ import ..Helpers: Immutable
             @test 1 ∈ idxed && 2 ∈ idxed && 3 ∈ idxed
             @test set !== idxed
         end
+        let idxed = indexed(nothing)
+            @test length(idxed) == 1
+            @test idxed[1] === nothing
+        end
+        let idxed = indexed(42)
+            @test length(idxed) == 1
+            @test idxed[1] == 42
+        end
     end
     
     @testset "iterable" begin
