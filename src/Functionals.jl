@@ -64,7 +64,7 @@ struct Indexed <: Indexability end
 struct Collectible <: Indexability end
 struct Singular <: Indexability end
 @generated function indexability(x)
-    if hassignature(getindex, x, Integer)
+    if hassignature(getindex, x, Integer) && hassignature(length, x) && hassignature(firstindex, x) && hassignature(lastindex, x)
         :(Indexed())
     elseif hassignature(iterate, x)
         :(Collectible())
