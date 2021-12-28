@@ -79,5 +79,17 @@ import ..Helpers: Immutable
         @test !falsy(-1)
         @test !falsy(1//1)
     end
+    
+    @testset "bytes" begin
+        @test bytes(UInt8(42)) == [0x2A]
+        @test bytes(Int8(69)) == [0x45]
+        @test bytes(hton(UInt16(42))) == [0x00, 0x2A]
+        @test bytes(hton(Int16(69))) == [0x00, 0x45]
+        @test bytes(hton(Int32(69696969))) == [0x04, 0x27, 0x7D, 0xC9]
+        @test bytes(hton(Int64(6969696969))) == [0x00, 0x00, 0x00, 0x01, 0x9F, 0x6D, 0x22, 0xC9]
+        @test bytes(0.42069) == [0x78, 0x45, 0xF0, 0xBF, 0x95, 0xEC, 0xDA, 0x3F]
+        
+        @test bytes((0x1, 0x2, 0x3)) == [0x01, 0x02, 0x03]
+    end
 end
 end # module TestFunctionals

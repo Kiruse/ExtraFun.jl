@@ -94,3 +94,12 @@ If `x` is iterable (i.e. `iterate(x)` exists), return `x`. Otherwise, return an 
 iterable(x) = iterable(iterability(x), x)
 iterable(::Iterable, x) = x
 iterable(::NonIterable, x) = (x,)
+
+export bytes
+bytes(b::Union{UInt8, Int8}) = [convert(UInt8, b)]
+bytes(t::Tuple) = bytes(collect(t))
+function bytes(x)
+    buf = IOBuffer()
+    write(buf, x)
+    take!(buf)
+end
